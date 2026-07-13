@@ -8,6 +8,7 @@ from robostudio_engine.cli import main
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "examples" / "mock_multi_format"
+VLA_EPISODES = ROOT / "examples" / "mock_episode_set"
 
 
 def test_cli_inspect_index_export_and_blockers(tmp_path, capsys):
@@ -26,8 +27,7 @@ def test_cli_inspect_index_export_and_blockers(tmp_path, capsys):
 
 
 def test_cli_probe_stream(capsys):
-    episodes = ROOT.parent / "vla-robustness-kit" / "examples" / "mock_episode_set"
-    assert main(["probe", str(episodes), "--stream"]) == 0
+    assert main(["probe", str(VLA_EPISODES), "--stream"]) == 0
     lines = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
     assert lines[0]["event"] == "probe_trial"
     assert lines[-1]["event"] == "probe_complete"
@@ -45,8 +45,7 @@ def test_cli_probe_byo_policy_adapter(tmp_path, capsys):
     )
     policy.chmod(0o755)
 
-    episodes = ROOT.parent / "vla-robustness-kit" / "examples" / "mock_episode_set"
-    assert main(["probe", str(episodes), "--policy", str(policy)]) == 0
+    assert main(["probe", str(VLA_EPISODES), "--policy", str(policy)]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["status"] == "ok"
     assert payload["policy"] == "byo"

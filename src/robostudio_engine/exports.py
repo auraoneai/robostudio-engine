@@ -216,7 +216,7 @@ def _intake_manifest(
         "$schema": INTAKE_SCHEMA_ID,
         "manifest_version": "1.0.0",
         "product": "robotics-studio-open",
-        "product_version": "0.1.1",
+        "product_version": "0.1.2",
         "platform_version": "0.3.0",
         "created_at": created_at,
             "project_id": str(
@@ -245,7 +245,7 @@ def _intake_manifest(
         },
         "payload_manifest": payload_manifest,
         "provenance": {
-            "engine_libs": {"robostudio-engine": "0.1.1"},
+            "engine_libs": {"robostudio-engine": "0.1.2"},
             "os": _platform_os(),
             "os_version": system(),
             "app_install_id_hash": sha256(b"robotics-studio-open-local-export").hexdigest(),

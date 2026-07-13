@@ -18,16 +18,16 @@ dataset metadata.
 Core commands have no required third-party runtime dependencies:
 
 ```bash
-python -m pip install "robostudio-engine==0.1.1"
+python -m pip install "robostudio-engine==0.1.2"
 ```
 
 Install only the extras needed by a workflow:
 
 ```bash
-python -m pip install "robostudio-engine[hdf5]==0.1.1"
-python -m pip install "robostudio-engine[hf]==0.1.1"
-python -m pip install "robostudio-engine[ml]==0.1.1"
-python -m pip install "robostudio-engine[trust]==0.1.1"
+python -m pip install "robostudio-engine[hdf5]==0.1.2"
+python -m pip install "robostudio-engine[hf]==0.1.2"
+python -m pip install "robostudio-engine[ml]==0.1.2"
+python -m pip install "robostudio-engine[trust]==0.1.2"
 ```
 
 The `ml` extra includes large model and clustering dependencies. The `trust`
@@ -117,9 +117,9 @@ desktop application.
 
 Verified on 2026-07-13:
 
-- PyPI: [`robostudio-engine==0.1.1`](https://pypi.org/project/robostudio-engine/0.1.1/)
+- PyPI: [`robostudio-engine==0.1.2`](https://pypi.org/project/robostudio-engine/0.1.2/)
 - Source: [`auraoneai/robostudio-engine`](https://github.com/auraoneai/robostudio-engine)
-- GitHub release: [`v0.1.1`](https://github.com/auraoneai/robostudio-engine/releases/tag/v0.1.1)
+- GitHub release: [`v0.1.2`](https://github.com/auraoneai/robostudio-engine/releases/tag/v0.1.2)
 - The separate Robotics Studio Open product has a `v0.2.0` release; that product
   release is not a second `robostudio-engine` package release.
 - Checked-in datasets and media are synthetic fixtures.

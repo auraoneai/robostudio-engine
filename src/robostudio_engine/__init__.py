@@ -30,7 +30,7 @@ from .runners import (
 from .sensor_qa import SensorQARunner
 from .thumbnails import ThumbnailWorkerPool
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 __all__ = [
     "Dataset",
