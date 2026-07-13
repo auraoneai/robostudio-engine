@@ -13,8 +13,10 @@ from robostudio_engine.exporters import create_intake_packet
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OPEN_SOURCE_ROOT = Path(__file__).resolve().parents[1]
-PLATFORM_SCHEMA_ROOT = OPEN_SOURCE_ROOT / "schemas"
+OPEN_SOURCE_ROOT = Path(__file__).resolve().parents[2]
+PLATFORM_SCHEMA_ROOT = ROOT / "schemas"
+if not PLATFORM_SCHEMA_ROOT.exists():
+    PLATFORM_SCHEMA_ROOT = OPEN_SOURCE_ROOT / "open-studio-platform" / "schemas"
 FIXTURES = ROOT / "examples" / "mock_multi_format"
 
 

@@ -21,7 +21,7 @@ from robostudio_engine import (
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "examples" / "mock_multi_format"
-VLA_EPISODES = ROOT / "examples" / "mock_episode_set"
+VLA_EPISODES = ROOT.parent / "vla-robustness-kit" / "examples" / "mock_episode_set"
 
 
 def test_sensor_qa_detects_dropped_frames_and_exports_markdown():

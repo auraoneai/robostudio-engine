@@ -1,63 +1,130 @@
 # robostudio-engine
 
-Used inside Robotics Studio Open.
+`robostudio-engine` is the headless Python dataset engine and `robostudio` CLI
+for inspecting, indexing, reviewing, clustering, probing, and exporting robotics
+dataset metadata.
 
-This package includes the `robostudio` CLI and the companion open robotics
-quality, VLA probing, recovery, embodiment-card, review, and failure-gallery
-modules needed by the engine runtime.
+## At a Glance
 
-`robostudio-engine` is the headless Python engine for Robotics Studio Open. It provides dataset adapters, streaming SQLite indexing, thumbnail generation, hardware decode discovery hooks, sensor QA, failure clustering, subsystem wrappers around the six AuraOne robotics OSS libraries, and CLI export parity for CI and remote Linux review jobs.
+| | |
+| --- | --- |
+| Job | Provide scriptable dataset operations for local review and CI without the desktop UI. |
+| Built for | Robotics dataset engineers, review-tool builders, and automation owners. |
+| Differentiator | One adapter contract across multiple dataset layouts plus local sidecar indexing and explicit export boundaries. |
+| Produces | Episode inventories, SQLite indexes, thumbnails, QA reports, cluster manifests, probe reports, and metadata exports. |
 
-## What ships
+## Install
 
-- Dataset adapters: LeRobot v3/v2, RLDS, OpenX, HDF5 profiles for ALOHA/ACT/RoboMimic/generic, rosbag2 sqlite with rosbag1 legacy fallback, and folder-of-mp4-jsonl.
-- `EpisodeAdapter` contract with lazy `EpisodeHandle` and `StreamHandle` primitives.
-- Sidecar SQLite index at `<dataset>/.robostudio/index.sqlite` with saved view support.
-- Lazy thumbnail worker pool at `<dataset>/.robostudio/thumbs/`, using hardware decode when `ffmpeg` exposes VideoToolbox, VAAPI, NVDEC/CUDA, or DXVA2 and SVG placeholders otherwise.
-- Sensor QA for dropped frames, calibration drift, AV sync, joint-state continuity, timestamp monotonicity, and sample-rate stability.
-- Failure clustering with privacy-preserving hash, CLIP text embeddings plus HDBSCAN when installed with `robostudio-engine[ml]`, and a custom encoder executable protocol.
-- Wrappers for `lerobot-quality-gates`, `robot-recovery-bench`, `vla-robustness-kit`, `embodiment-card`, `robotics-reviewkit`, and `failure-gallery`.
-- Local disk, Hugging Face Hub, AuraOne intake packet, and failure-gallery contribution exports.
+Core commands have no required third-party runtime dependencies:
 
-## CLI
+```bash
+python -m pip install "robostudio-engine==0.1.1"
+```
+
+Install only the extras needed by a workflow:
+
+```bash
+python -m pip install "robostudio-engine[hdf5]==0.1.1"
+python -m pip install "robostudio-engine[hf]==0.1.1"
+python -m pip install "robostudio-engine[ml]==0.1.1"
+python -m pip install "robostudio-engine[trust]==0.1.1"
+```
+
+The `ml` extra includes large model and clustering dependencies. The `trust`
+extra installs the published companion trust tools used by the wrapper
+commands.
+
+## Verified Quickstart
+
+Run from a source checkout:
 
 ```bash
 robostudio inspect examples/mock_multi_format/lerobot_v3
-robostudio index examples/mock_multi_format/lerobot_v3 --json-lines
-robostudio qa examples/mock_multi_format/lerobot_v3 --format markdown --out /tmp/qa.md
-robostudio cluster examples/mock_multi_format/lerobot_v3 --min-cluster-size 1 --out /tmp/clusters.json
-robostudio probe ../vla-robustness-kit/examples/mock_episode_set --policy mock --stream
-robostudio probe ../vla-robustness-kit/examples/mock_episode_set --policy ./policy_adapter.py --stream
-robostudio export examples/mock_multi_format/lerobot_v3 --to manifest --out /tmp/robostudio-export
-robostudio export examples/mock_multi_format/lerobot_v3 --to hf-hub --repo owner/name --out /tmp/hf-prep
 ```
 
-HF Hub upload is attempted only when `huggingface_hub` is installed and `HF_TOKEN` or `HUGGINGFACE_TOKEN` is set. Otherwise the command writes a release-ready prepared directory plus a dated blocker note.
+The bundled fixture is detected as `lerobot` and reports two episodes. `inspect`
+is read-only.
 
-BYO VLA policies are executable adapters. Robotics Studio sends one JSON object on stdin with `episode` and `perturbation`; the adapter returns JSON with `passed`, `confidence`, and optional `cluster`.
+## Core Command Surface
 
-## Python API
+| Commands | Evidence or side effect |
+| --- | --- |
+| `inspect` | JSON adapter name and normalized episode inventory. |
+| `index`, `query` | SQLite index at `<dataset>/.robostudio/index.sqlite`. |
+| `thumbs` | Thumbnail files under `<dataset>/.robostudio/thumbs/`. |
+| `qa` | JSON or Markdown sensor QA findings. |
+| `cluster` | Hash, CLIP, or custom-encoder failure clusters. |
+| `export` | Local manifest, metadata bridge, Hugging Face preparation/upload, or intake ZIP. |
+| `decode-info`, `plugins validate`, `smoke` | Local capability and contract checks. |
 
-```python
-from robostudio_engine import (
-    QualityGateRunner,
-    RecoveryAnalyzer,
-    VLAProbeRunner,
-    EmbodimentCardGenerator,
-    ReviewKitValidator,
-    FailureGalleryExporter,
-    build_streaming_index,
-)
+Adapters cover the checked-in LeRobot v2/v3, RLDS, OpenX, HDF5 profile,
+rosbag, and folder-of-MP4-plus-JSONL shapes. Support is fixture-backed metadata
+parsing, not a claim of compatibility with every producer or version.
 
-stats = build_streaming_index("examples/mock_multi_format/lerobot_v3")
-quality = QualityGateRunner().run("examples/mock_multi_format/lerobot_v3")
-probe = VLAProbeRunner().run("../vla-robustness-kit/examples/mock_episode_set")
-```
+## Companion Trust Tools
 
-## Release blockers when credentials are unavailable
+The engine contains executable wrappers for:
 
-```bash
-robostudio release-blockers --out dist/RELEASE_BLOCKERS.md
-```
+- `lerobot-quality-gates`;
+- `robot-recovery-bench`;
+- `vla-robustness-kit`;
+- `embodiment-card`;
+- `robotics-reviewkit`;
+- `failure-gallery`.
 
-The blocker file records auth-gated steps for PyPI publish, HF Hub sample dataset upload, and failure-gallery PR opening.
+These projects are not required by the core engine. Install the `trust` extra
+before using `quality-gates`, `recovery`, `probe`, `card`, or failure-gallery
+preview behavior. `robotics-reviewkit` remains a source-distributed companion
+and must be installed separately for `validate-review`. In the AuraOne
+monorepo, the engine can also discover sibling `src` directories.
+
+## Runtime, Data, and Network Boundary
+
+- Core adapters, indexing, QA, hash clustering, plugin validation, and local
+  exports operate on local files.
+- `index` and `thumbs` write inside the dataset's `.robostudio` directory.
+  `ffmpeg` is invoked locally for supported thumbnail paths.
+- `inspect`, metadata bridge exports, and some reports can contain local paths
+  or source metadata. Review outputs before sharing.
+- Training-ready manifest and intake exports scrub absolute paths and
+  secret-like fields and exclude raw media. Metadata bridge JSONL preserves
+  normalized episode metadata and needs separate review.
+- Intake export writes a local ZIP with an intended destination; it does not
+  transmit the packet.
+- Hugging Face upload occurs only with the `hf` extra plus `HF_TOKEN` or
+  `HUGGINGFACE_TOKEN`. Without them, the command prepares local files and a
+  blocker note.
+- CLIP clustering can download model files into `~/.cache/robostudio`; a custom
+  encoder or BYO VLA policy runs an explicit local executable.
+
+## Limitations
+
+- Adapter support is fixture-backed parsing for known layouts, not a claim of
+  compatibility with every dataset producer, codec, or schema revision.
+- The wheel contains only `robostudio_engine`; companion trust tools are
+  installed through the `trust` extra or discovered from a source checkout.
+- `robotics-reviewkit` is not included in the `trust` extra because it is not a
+  standalone PyPI distribution.
+
+## Robotics Studio Open Integration
+
+Robotics Studio Open documents that the `robostudio` CLI ships with its desktop
+installers. That is a direct executable product integration. The standalone
+package remains useful for CI and headless review without installing the
+desktop application.
+
+## Publication Status
+
+Verified on 2026-07-13:
+
+- PyPI: [`robostudio-engine==0.1.1`](https://pypi.org/project/robostudio-engine/0.1.1/)
+- Source: [`auraoneai/robostudio-engine`](https://github.com/auraoneai/robostudio-engine)
+- GitHub release: [`v0.1.1`](https://github.com/auraoneai/robostudio-engine/releases/tag/v0.1.1)
+- The separate Robotics Studio Open product has a `v0.2.0` release; that product
+  release is not a second `robostudio-engine` package release.
+- Checked-in datasets and media are synthetic fixtures.
+
+## Next Action
+
+Run `inspect` against a copy of one review candidate, then run `qa` and inspect
+all emitted paths and metadata before creating an export.

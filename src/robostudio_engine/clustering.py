@@ -98,7 +98,7 @@ class FailureClusterer:
                 raise RuntimeError("custom encoder stdout exceeded 1000000 bytes")
             payload = json.loads(result.stdout)
             vector = payload.get("embedding", payload)
-            if isinstance(vector, list) and all(isinstance(item, int | float) for item in vector):
+            if isinstance(vector, list) and all(isinstance(item, (int, float)) for item in vector):
                 return [float(item) for item in vector]
         raise RuntimeError(f"custom encoder failed for {episode.episode_id}: {result.stderr.strip()}")
 

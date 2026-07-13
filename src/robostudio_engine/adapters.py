@@ -53,11 +53,11 @@ def _mtime(path: Path) -> float:
 def _duration_from_times(item: dict[str, Any]) -> float | None:
     for key in ("duration_seconds", "duration_s", "episode_length_seconds"):
         value = item.get(key)
-        if isinstance(value, int | float) and value >= 0:
+        if isinstance(value, (int, float)) and value >= 0:
             return float(value)
     start = item.get("start_time", item.get("start_timestamp"))
     end = item.get("end_time", item.get("end_timestamp"))
-    if isinstance(start, int | float) and isinstance(end, int | float) and end >= start:
+    if isinstance(start, (int, float)) and isinstance(end, (int, float)) and end >= start:
         return float(end - start)
     return None
 
@@ -84,7 +84,7 @@ def _feature_streams(info: dict[str, Any], fps: float | None = None) -> list[Sen
             dtype = str(feature.get("dtype", feature.get("type", "custom")))
             kind = "rgb" if dtype == "video" or "image" in name else "joint_state" if "state" in name else "action" if name == "action" else dtype
             rate = fps if kind in {"rgb", "depth"} else feature.get("rate_hz")
-            streams.append(SensorStream(name=name, kind=kind, rate_hz=rate if isinstance(rate, int | float) else None, shape=list(feature.get("shape", []))))
+            streams.append(SensorStream(name=name, kind=kind, rate_hz=rate if isinstance(rate, (int, float)) else None, shape=list(feature.get("shape", []))))
     sensors = info.get("sensors", [])
     if isinstance(sensors, list):
         for index, sensor in enumerate(sensors):
@@ -93,7 +93,7 @@ def _feature_streams(info: dict[str, Any], fps: float | None = None) -> list[Sen
                     SensorStream(
                         name=str(sensor.get("name") or sensor.get("id") or f"sensor_{index}"),
                         kind=str(sensor.get("type") or "custom"),
-                        rate_hz=float(sensor["rate_hz"]) if isinstance(sensor.get("rate_hz"), int | float) else None,
+                        rate_hz=float(sensor["rate_hz"]) if isinstance(sensor.get("rate_hz"), (int, float)) else None,
                         metadata=dict(sensor),
                     )
                 )
@@ -145,7 +145,7 @@ class LeRobotAdapter(BaseAdapter):
         else:
             episodes_path = root / "meta" / "episodes.jsonl"
             rows = _read_jsonl(episodes_path)
-        fps = float(info["fps"]) if isinstance(info.get("fps"), int | float) else None
+        fps = float(info["fps"]) if isinstance(info.get("fps"), (int, float)) else None
         streams = _feature_streams(info if isinstance(info, dict) else {}, fps)
         for item in rows if isinstance(rows, list) else []:
             if not isinstance(item, dict):
@@ -433,7 +433,7 @@ class Mp4JsonlFolderAdapter(BaseAdapter):
                 duration_seconds=_duration_from_times(item),
                 frame_count=item.get("frame_count") if isinstance(item.get("frame_count"), int) else None,
                 success=_success(item),
-                intervention_count=int(intervention_count) if isinstance(intervention_count, int | float) else 0,
+                intervention_count=int(intervention_count) if isinstance(intervention_count, (int, float)) else 0,
                 embodiment=str(item.get("embodiment") or "") or None,
                 task_tag=str(item.get("task") or item.get("instruction") or "") or None,
                 sensor_schema=streams,

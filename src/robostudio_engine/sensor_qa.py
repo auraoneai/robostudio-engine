@@ -81,7 +81,7 @@ class SensorQARunner:
         return []
 
     def _sample_rate_stability(self, episode: EpisodeMeta, metadata: dict[str, Any]) -> list[QAFinding]:
-        timestamps = [float(value) for value in metadata.get("timestamps", []) if isinstance(value, int | float)]
+        timestamps = [float(value) for value in metadata.get("timestamps", []) if isinstance(value, (int, float))]
         if len(timestamps) < 4:
             return []
         deltas = [b - a for a, b in zip(timestamps, timestamps[1:]) if b > a]
@@ -121,7 +121,7 @@ class SensorQARunner:
 
     def _av_sync(self, episode: EpisodeMeta, metadata: dict[str, Any]) -> list[QAFinding]:
         offset = metadata.get("audio_video_offset_ms", metadata.get("av_offset_ms"))
-        if isinstance(offset, int | float) and abs(offset) > self.av_sync_tolerance_ms:
+        if isinstance(offset, (int, float)) and abs(offset) > self.av_sync_tolerance_ms:
             return [QAFinding("audio_video_sync", "warn", episode.episode_id, "audio", "audio/video sync offset exceeds tolerance", {"offset_ms": offset})]
         return []
 
@@ -130,7 +130,7 @@ class SensorQARunner:
         if isinstance(drift, dict):
             findings = []
             for sensor, value in drift.items():
-                if isinstance(value, int | float) and value > 0.02:
+                if isinstance(value, (int, float)) and value > 0.02:
                     findings.append(QAFinding("calibration_drift", "warn", episode.episode_id, str(sensor), "camera calibration drift exceeds tolerance", {"drift": value}))
             return findings
         return []
@@ -147,12 +147,12 @@ def write_sensor_qa_report(report: dict[str, Any], out: str | Path, fmt: str = "
 
 
 def _number(value: Any) -> float | None:
-    return float(value) if isinstance(value, int | float) else None
+    return float(value) if isinstance(value, (int, float)) else None
 
 
 def _flatten_numeric(value: Any) -> list[float]:
-    if isinstance(value, int | float):
+    if isinstance(value, (int, float)):
         return [float(value)]
     if isinstance(value, list):
-        return [float(item) if isinstance(item, int | float) else math.nan for item in value]
+        return [float(item) if isinstance(item, (int, float)) else math.nan for item in value]
     return []

@@ -26,7 +26,7 @@ def test_cli_inspect_index_export_and_blockers(tmp_path, capsys):
 
 
 def test_cli_probe_stream(capsys):
-    episodes = ROOT / "examples" / "mock_episode_set"
+    episodes = ROOT.parent / "vla-robustness-kit" / "examples" / "mock_episode_set"
     assert main(["probe", str(episodes), "--stream"]) == 0
     lines = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
     assert lines[0]["event"] == "probe_trial"
@@ -45,7 +45,7 @@ def test_cli_probe_byo_policy_adapter(tmp_path, capsys):
     )
     policy.chmod(0o755)
 
-    episodes = ROOT / "examples" / "mock_episode_set"
+    episodes = ROOT.parent / "vla-robustness-kit" / "examples" / "mock_episode_set"
     assert main(["probe", str(episodes), "--policy", str(policy)]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["status"] == "ok"

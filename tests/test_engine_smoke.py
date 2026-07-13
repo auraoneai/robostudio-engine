@@ -15,7 +15,11 @@ from robostudio_engine.qa import sensor_qa_report
 from robostudio_engine.vla import run_vla_probe
 
 
-FIXTURE = Path(__file__).resolve().parents[1] / "examples" / "sample-so101"
+ROOT = Path(__file__).resolve().parents[1]
+MONOREPO_FIXTURE = ROOT.parent / "robotics-studio" / "fixtures" / "sample-so101"
+FIXTURE = ROOT / "examples" / "sample-so101"
+if not FIXTURE.exists():
+    FIXTURE = MONOREPO_FIXTURE
 
 
 def test_fixture_loads_with_lerobot_adapter() -> None:
