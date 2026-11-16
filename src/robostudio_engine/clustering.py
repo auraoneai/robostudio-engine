@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from .contracts import EpisodeMeta
-from .adapters import list_episodes
 from .adapters import load_dataset
 
 MAX_CUSTOM_ENCODER_STDOUT_BYTES = 1_000_000
@@ -210,19 +209,6 @@ def _hdbscan_labels(vectors: Sequence[Sequence[float]], min_cluster_size: int) -
         return [-1 for _ in vectors]
     labels = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size).fit_predict(np.asarray(vectors, dtype=float))
     return [int(label) for label in labels]
-
-
-def cluster_failures(dataset_path: str, embedding: str = "hash", min_cluster_size: int = 1) -> dict[str, Any]:
-    """Compatibility wrapper used by the desktop app and older smoke tests."""
-
-    episodes = list_episodes(dataset_path)
-    clusters = FailureClusterer(embedding=embedding, min_cluster_size=min_cluster_size).cluster(episodes)
-    return {
-        "schema": "robostudio.failure_clusters.v1",
-        "dataset": str(dataset_path),
-        "embedding": embedding,
-        "clusters": [cluster.to_dict() for cluster in clusters],
-    }
 
 
 def cluster_failures(dataset_path: str, strategy: str = "hash") -> dict[str, Any]:
