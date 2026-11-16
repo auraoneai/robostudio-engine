@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import sqlite3
 import subprocess
-from pathlib import Path
 
 from robostudio_engine import list_episodes
 from robostudio_engine.contracts import EpisodeMeta
