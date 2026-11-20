@@ -1,5 +1,15 @@
 # robostudio-engine
 
+**Headless robotics dataset engine and CLI.** Part of [Robotics Studio](https://auraone.ai/open/robotics-studio).
+
+```bash
+python -m pip install "robostudio-engine==0.1.2"
+robostudio inspect examples/mock_multi_format/lerobot_v3
+```
+
+From a source checkout, the bundled fixture is detected as `lerobot` with two
+episodes (`"adapter": "lerobot"`, `"episode_count": 2`).
+
 `robostudio-engine` is the headless Python dataset engine and `robostudio` CLI
 for inspecting, indexing, reviewing, clustering, probing, and exporting robotics
 dataset metadata.
@@ -128,3 +138,12 @@ Verified on 2026-07-13:
 
 Run `inspect` against a copy of one review candidate, then run `qa` and inspect
 all emitted paths and metadata before creating an export.
+
+Part of the AuraOne robotics dataset QA workflow:
+[lerobot-quality-gates](https://auraone.ai/open/lerobot-quality-gates) →
+[Robotics Studio](https://auraone.ai/open/robotics-studio).
+
+---
+
+Need reviewed demonstration data or dataset quality operations at scale?
+[Talk to AuraOne](https://auraone.ai/contact?from=open:robostudio-engine)
