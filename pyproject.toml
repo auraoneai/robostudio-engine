@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "robostudio-engine"
 version = "0.1.2"
-description = "Inspect, index, QA, cluster, probe, and export robotics datasets from a headless CLI."
+description = "Headless robotics dataset engine: inspect, index, QA, cluster, probe, and export robotics dataset metadata from a CLI."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
@@ -19,6 +19,7 @@ keywords = [
   "robotics",
   "rosbag",
   "vla",
+  "robotics-dataset-engine",
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
